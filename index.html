@@ -1,89 +1,40 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>간단 게시판</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 30px auto; }
-    input, textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
-    button { padding: 8px 16px; }
-    .post { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
-    .post-title { cursor: pointer; font-weight: bold; }
-    .post-content { display: none; margin-top: 5px; }
-    .delete-btn { background: red; color: white; border: none; padding: 4px 8px; float: right; cursor: pointer; }
-  </style>
+  <title>나만의 간단 게시판</title>
 </head>
 <body>
-
-  <h1>나만 쓰는 게시판</h1>
-
-  <input type="text" id="titleInput" placeholder="제목을 입력하세요" />
-  <textarea id="contentInput" placeholder="내용을 입력하세요" rows="4"></textarea>
-  <button id="addBtn">글 추가</button>
-
+  <h2>나만 쓰는 게시판</h2>
+  <textarea id="postContent" rows="4" cols="50" placeholder="여기에 글을 쓰세요"></textarea><br>
+  <button onclick="addPost()">글 등록</button>
+  
+  <h3>게시글 목록</h3>
   <div id="posts"></div>
-
+  
   <script>
-    const titleInput = document.getElementById('titleInput');
-    const contentInput = document.getElementById('contentInput');
-    const addBtn = document.getElementById('addBtn');
-    const postsDiv = document.getElementById('posts');
-
-    addBtn.addEventListener('click', () => {
-      const title = titleInput.value.trim();
-      const content = contentInput.value.trim();
-
-      if (!title || !content) {
-        alert('제목과 내용을 모두 입력하세요.');
-        return;
-      }
-
-      // 게시물 요소 생성
-      const postDiv = document.createElement('div');
-      postDiv.className = 'post';
-
-      // 제목
-      const titleDiv = document.createElement('div');
-      titleDiv.className = 'post-title';
-      titleDiv.textContent = title;
-
-      // 내용
-      const contentDiv = document.createElement('div');
-      contentDiv.className = 'post-content';
-      contentDiv.textContent = content;
-
-      // 삭제 버튼
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'delete-btn';
-      deleteBtn.textContent = '삭제';
-
-      // 삭제 버튼 클릭 시 게시물 삭제
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 제목 클릭 이벤트 막기
-        postsDiv.removeChild(postDiv);
+    function loadPosts() {
+      const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+      const postsDiv = document.getElementById('posts');
+      postsDiv.innerHTML = '';
+      posts.forEach((post, index) => {
+        const div = document.createElement('div');
+        div.style.border = '1px solid #ccc';
+        div.style.margin = '5px 0';
+        div.style.padding = '5px';
+        div.textContent = post;
+        postsDiv.appendChild(div);
       });
-
-      // 제목 클릭 시 내용 보이기/숨기기 토글
-      titleDiv.addEventListener('click', () => {
-        if (contentDiv.style.display === 'none' || contentDiv.style.display === '') {
-          contentDiv.style.display = 'block';
-        } else {
-          contentDiv.style.display = 'none';
-        }
-      });
-
-      postDiv.appendChild(deleteBtn);
-      postDiv.appendChild(titleDiv);
-      postDiv.appendChild(contentDiv);
-
-      postsDiv.appendChild(postDiv);
-
-      // 입력칸 초기화
-      titleInput.value = '';
-      contentInput.value = '';
-    });
+    }
+    function addPost() {
+      const content = document.getElementById('postContent').value.trim();
+      if (!content) return alert('내용을 입력하세요!');
+      const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+      posts.unshift(content);
+      localStorage.setItem('posts', JSON.stringify(posts));
+      document.getElementById('postContent').value = '';
+      loadPosts();
+    }
+    loadPosts();
   </script>
-
 </body>
 </html>
-
